@@ -1,19 +1,32 @@
 --uid = get_cookie("UID");
-upstream = "six@0";
---f=io.open("/Users/hupeng/log", "aw");
+--f=io.open("/Users/hupeng/log", "a");
+--f:write(string.format("%s\n", package.cpath));
+--f:write(string.format("%s\n", "hupengtest!"));
+--dp_domain_weight = json.decode("{\"six@1\":\"1\",\"six@2\":\"1\"}");
+--for key, value in pairs(dp_domain_weight) do
+--	f:write(string.format("%s %s\n", key, value));
+--end
+--f:close();
+
 function choose_upstream()
-	uid = get_ngx_http_variable("cookie_uid");
+	--f=io.open("/Users/hupeng/log", "aw");
+	uid = get_ngx_http_variable();
 
 	--uid = "test";
-	--f:write(string.format("%d %d %d\n", uid, 1, 1));
+	--f:write(string.format("%d %d %d\n", uid, #dp_domain_weight, 1));
+	--f:write(string.format("%d\n", uid));
 	ups = {get_upstream_list()};
-	--for key, value in pairs(ups) do
-	--	f:write(string.format("%s %s %d %d\n", key, value, 1, 1));
-	--end
+	
 	if #ups == 0 then
+		upstream = nil;
+		return;
+	end
+	if #ups == 2 then
+		upstream = ups[1];
 		return;
 	end
 	ups_cnt = #ups;
+	--f:close();
 	i = 2;
 	bucket_cnt = 0;
 	while i <= ups_cnt do
